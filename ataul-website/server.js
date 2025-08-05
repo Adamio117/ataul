@@ -1,69 +1,59 @@
-require('dotenv').config();
-const express = require('express');
-const { createClient } = require('@supabase/supabase-js');
-const { Resend } = require('resend');
-const fetch = require('node-fetch');
+require("dotenv").config();
+const express = require("express");
+const { createClient } = require("@supabase/supabase-js");
+const nodemailer = require("nodemailer");
+const fetch = require("node-fetch");
 
 const app = express();
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// Supabase клиент
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY,
-  { auth: { persistSession: false } }
+  process.env.SUPABASE_KEY
 );
 
-app.use(express.json());
+// Настройка почты (используем Yandex вместо Resend)
+const transporter = nodemailer.createTransport({
+  host: "smtp.yandex.ru",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
-// Обработчик формы
-app.post('/submit-order', async (req, res) => {
+app.post("/submit-order", async (req, res) => {
   try {
-    const formData = req.body;
+    // 1. Сохраняем в Supabase
+    const { data, error } = await supabase.from("orders").insert([req.body]);
 
-    // 1. Сохранение в Supabase
-    const { data, error } = await supabase
-      .from('orders')
-      .insert([formData])
-      .select();
+    if (error) throw error;
 
-    if (error) throw new Error(`Supabase error: ${error.message}`);
-
-    console.log('Saved to Supabase:', data);
-
-    // 2. Отправка email через Resend
-    const emailRes = await resend.emails.send({
-      from: 'notifications@yourdomain.com',
+    // 2. Отправляем письмо через Yandex
+    await transporter.sendMail({
+      from: `"Notifications" <${process.env.EMAIL_USER}>`,
       to: process.env.NOTIFICATION_EMAIL,
-      subject: 'Новая заявка',
-      html: `
-        <h2>Новая заявка</h2>
-        <p>Имя: ${formData.name}</p>
-        <p>Телефон: ${formData.phone}</p>
-        <p>Тип сайта: ${formData.site_type}</p>
-      `
+      subject: "Новая заявка",
+      html: `<p>Новая заявка от ${req.body.name}</p>`,
     });
 
-    console.log('Email sent:', emailRes);
-
-    // 3. Уведомление в Telegram
-    await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: process.env.TELEGRAM_CHAT_ID,
-        text: `📌 Новая заявка!\nИмя: ${formData.name}\nТел: ${formData.phone}\nТип: ${formData.site_type}`
-      })
-    });
+    // 3. Отправляем в Telegram
+    await fetch(
+      `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: process.env.TELEGRAM_CHAT_ID,
+          text: `Новая заявка: ${req.body.name}\nТелефон: ${req.body.phone}`,
+        }),
+      }
+    );
 
     res.json({ success: true });
-    
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 });
 
-// Запуск сервера
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(process.env.PORT || 3000);
