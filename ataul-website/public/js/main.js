@@ -158,16 +158,16 @@ if (orderForm) {
 
     try {
       // Send data to Supabase
-      const response = await fetch(
-        "https://ataul-4b4z.onrender.com/submit-order",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch("https://ataul-4b4z.onrender.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json", // Добавьте этот заголовок
+        },
+        body: JSON.stringify(formData),
+      });
+
+      console.log("Server response:", await response.json()); // Логируем ответ
 
       if (response.ok) {
         alert("Спасибо за вашу заявку! Мы свяжемся с вами в ближайшее время.");
