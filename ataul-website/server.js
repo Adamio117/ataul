@@ -1,3 +1,21 @@
+// Настройка Supabase
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY,
+  {
+    auth: {
+      persistSession: false,
+    },
+  }
+);
+
+// Логирование всех переменных
+console.log("Env variables:", {
+  supabaseUrl: process.env.SUPABASE_URL?.slice(0, 10) + "...",
+  supabaseKey: process.env.SUPABASE_KEY?.slice(0, 5) + "...",
+  emailUser: process.env.EMAIL_USER,
+  notifyEmail: process.env.NOTIFICATION_EMAIL,
+});
 // Обработчик формы
 app.post("/submit-order", async (req, res) => {
   try {
@@ -28,4 +46,32 @@ app.post("/submit-order", async (req, res) => {
     console.error("Server error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
+  const testEmail = async () => {
+    try {
+      await transporter.sendMail({
+        from: `"Test" <${process.env.EMAIL_USER}>`,
+        to: process.env.NOTIFICATION_EMAIL,
+        subject: "ТЕСТОВОЕ ПИСЬМО",
+        text: "Это тест",
+      });
+      console.log("Email отправлен успешно");
+    } catch (e) {
+      console.error("Email ошибка:", e);
+    }
+  };
+
+  testEmail();
+  const testSupabase = async () => {
+    const testData = {
+      name: "TEST",
+      email: "test@test.com",
+      created_at: new Date(),
+    };
+
+    const { data, error } = await supabase.from("orders").insert([testData]);
+
+    console.log("Supabase Test:", { data, error });
+  };
+
+  testSupabase(); // Вызовите при старте сервера
 });
