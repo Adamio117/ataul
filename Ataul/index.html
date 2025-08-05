@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ataul - Профессиональная разработка сайтов</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="parallax-header">
+        <nav>
+            <div class="logo">Ataul</div>
+            <ul class="nav-links">
+                <li><a href="#services">Услуги</a></li>
+                <li><a href="#calculator">Калькулятор</a></li>
+                <li><a href="#portfolio">Портфолио</a></li>
+                <li><a href="#about">О нас</a></li>
+                <li><a href="#contact">Контакты</a></li>
+            </ul>
+            <div class="burger">
+                <div class="line1"></div>
+                <div class="line2"></div>
+                <div class="line3"></div>
+            </div>
+        </nav>
+        <div class="hero-content">
+            <h1 class="animate-on-scroll">Создаем современные сайты для вашего бизнеса</h1>
+            <p class="animate-on-scroll">От идеи до реализации - профессиональный подход к каждому проекту</p>
+            <a href="#order" class="cta-button animate-on-scroll">Заказать сайт</a>
+        </div>
+    </header>
+
+    <section id="services" class="services-section">
+        <h2 class="section-title animate-on-scroll">Наши услуги</h2>
+        <div class="services-grid">
+            <div class="service-card animate-on-scroll">
+                <i class="fas fa-laptop-code"></i>
+                <h3>Лендинг</h3>
+                <p>Одностраничный сайт для презентации продукта или услуги</p>
+            </div>
+            <div class="service-card animate-on-scroll">
+                <i class="fas fa-shopping-cart"></i>
+                <h3>Интернет-магазин</h3>
+                <p>Полнофункциональная платформа для онлайн-продаж</p>
+            </div>
+            <div class="service-card animate-on-scroll">
+                <i class="fas fa-building"></i>
+                <h3>Корпоративный сайт</h3>
+                <p>Представительство компании в интернете</p>
+            </div>
+            <div class="service-card animate-on-scroll">
+                <i class="fas fa-mobile-alt"></i>
+                <h3>Веб-приложения</h3>
+                <p>Сложные интерактивные системы для бизнеса</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="calculator" class="calculator-section">
+        <h2 class="section-title animate-on-scroll">Калькулятор стоимости</h2>
+        <div class="calculator-container animate-on-scroll">
+            <div class="calculator-form">
+                <div class="form-group">
+                    <label for="site-type">Тип сайта</label>
+                    <select id="site-type">
+                        <option value="landing">Лендинг</option>
+                        <option value="corporate">Корпоративный сайт</option>
+                        <option value="shop">Интернет-магазин</option>
+                        <option value="webapp">Веб-приложение</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="pages">Количество страниц</label>
+                    <input type="range" id="pages" min="1" max="50" value="5">
+                    <span id="pages-value">5</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>Дополнительные функции</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="features" value="design"> Уникальный дизайн</label>
+                        <label><input type="checkbox" name="features" value="seo"> SEO-оптимизация</label>
+                        <label><input type="checkbox" name="features" value="admin"> Админ-панель</label>
+                        <label><input type="checkbox" name="features" value="multilang"> Мультиязычность</label>
+                        <label><input type="checkbox" name="features" value="payment"> Платежная система</label>
+                        <label><input type="checkbox" name="features" value="responsive"> Адаптивный дизайн</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="urgency">Срочность</label>
+                    <select id="urgency">
+                        <option value="1">Стандарт (4 недели)</option>
+                        <option value="1.5">Ускоренный (2 недели)</option>
+                        <option value="2">Экспресс (1 неделя)</option>
+                    </select>
+                </div>
+                
+                <button id="calculate-btn">Рассчитать стоимость</button>
+            </div>
+            
+            <div class="calculator-result">
+                <h3>Примерная стоимость</h3>
+                <div class="price-display">
+                    <span id="calculated-price">0</span> ₽
+                </div>
+                <p>Точную стоимость уточнит менеджер после обсуждения деталей</p>
+                <a href="#order" class="cta-button">Заказать</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="order" class="order-section">
+        <div class="order-container">
+            <h2 class="section-title animate-on-scroll">Заказать сайт</h2>
+            <form id="order-form" class="animate-on-scroll">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Ваше имя*</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email*</label>
+                        <input type="email" id="email" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone">Телефон*</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="company">Компания</label>
+                        <input type="text" id="company">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="site-type-order">Тип сайта*</label>
+                    <select id="site-type-order" required>
+                        <option value="">Выберите тип</option>
+                        <option value="landing">Лендинг</option>
+                        <option value="corporate">Корпоративный сайт</option>
+                        <option value="shop">Интернет-магазин</option>
+                        <option value="webapp">Веб-приложение</option>
+                        <option value="other">Другое</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="pages-order">Примерное количество страниц</label>
+                    <input type="number" id="pages-order" min="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="features-order">Необходимые функции</label>
+                    <textarea id="features-order" placeholder="Опишите, какие функции должны быть на сайте"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deadline">Желаемые сроки</label>
+                    <input type="text" id="deadline">
+                </div>
+                
+                <div class="form-group">
+                    <label for="budget">Бюджет</label>
+                    <input type="text" id="budget">
+                </div>
+                
+                <div class="form-group">
+                    <label for="comments">Дополнительные пожелания</label>
+                    <textarea id="comments" rows="4"></textarea>
+                </div>
+                
+                <button type="submit" class="submit-btn">Отправить заявку</button>
+            </form>
+        </div>
+    </section>
+
+    <section id="about" class="about-section">
+        <div class="about-container">
+            <div class="about-content animate-on-scroll">
+                <h2 class="section-title">О компании Ataul</h2>
+                <p>Мы - команда профессиональных разработчиков, дизайнеров и маркетологов, которые создают современные и эффективные веб-решения для бизнеса.</p>
+                <p>С 2023 года мы реализовали проекты различной сложности - от простых лендингов до сложных корпоративных порталов и интернет-магазинов.</p>
+                <p>Наш подход сочетает в себе креативность, техническую экспертизу и понимание бизнес-процессов.</p>
+            </div>
+            <div class="about-stats animate-on-scroll">
+                <div class="stat-item">
+                    <div class="stat-number" data-count="4">0</div>
+                    <div class="stat-label">Проекта</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-count="2">0</div>
+                    <div class="stat-label">Года опыта</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-count="7">0</div>
+                    <div class="stat-label">Специалистов</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-count="99">0</div>
+                    <div class="stat-label">% довольных клиентов</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact-section">
+        <h2 class="section-title animate-on-scroll">Контакты</h2>
+        <div class="contact-container animate-on-scroll">
+            <div class="contact-info">
+                <h3>Свяжитесь с нами</h3>
+                <p><i class="fas fa-map-marker-alt"></i> КЧР, с. Первомайское, ул. Правобережная 53</p>
+                <p><i class="fas fa-phone"></i> +7 (929)-009-6646</p>
+                <p><i class="fas fa-envelope"></i> info@ataul.ru</p>
+                <p><i class="fas fa-clock"></i> Пн-Пт: 9:00 - 18:00</p>
+                
+                <div class="social-links">
+                    <a href="img/tg.svg"><i class="fab fa-telegram"></i></a>
+                    <a href="img/wapp.svg"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="contact-map">
+                <a href="https://yandex.ru/maps/?um=constructor%3A23c2ff029555c5a1555d7cc32d53e4e81085b1dd2be3f671583a8a5cea4c7533&source=constructor" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style="display: block; width: 100%; height: 400px; background: #eee; border-radius: 10px; display: flex; align-items: center; justify-content: center; text-decoration: none; color: var(--primary-color); font-weight: 600;">
+                    <i class="fas fa-map-marked-alt" style="font-size: 2rem; margin-right: 1rem;"></i>
+                    Нажмите, что бы посмотреть где мы находимся
+                </a>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">Ataul</div>
+            <div class="footer-links">
+                <a href="#services">Услуги</a>
+                <a href="#portfolio">Портфолио</a>
+                <a href="#calculator">Калькулятор</a>
+                <a href="#about">О нас</a>
+                <a href="#contact">Контакты</a>
+            </div>
+            <div class="footer-copy">
+                &copy; 2025 Ataul. Все права защищены.
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/calculator.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
