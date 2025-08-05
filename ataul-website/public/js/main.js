@@ -159,7 +159,7 @@ if (orderForm) {
     try {
       // Send data to Supabase
       const response = await fetch(
-        "https://your-render-app-url.onrender.com/submit-order",
+        "https://ataul-4b4z.onrender.com/submit-order",
         {
           method: "POST",
           headers: {
