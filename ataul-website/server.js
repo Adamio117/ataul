@@ -19,6 +19,7 @@ app.use(
     origin: function (origin, callback) {
       const allowedOrigins = [
         "https://ataul-4b4z.onrender.com",
+        "https://ataull1onrender.com",
         "http://localhost:3000",
       ];
       if (!origin || allowedOrigins.includes(origin)) {
@@ -28,10 +29,11 @@ app.use(
       }
     },
     methods: ["GET", "POST", "OPTIONS"],
+
     credentials: true,
   })
 );
-
+app.options("*", cors());
 // Supabase client
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -154,7 +156,7 @@ app.post("/submit-order", async (req, res) => {
 
 // 404 Handler
 app.use((req, res) => {
-  res.status(404).sendFile(path.join(__dirname, "public", "404.html"));
+  res.status(404).sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // Error Handler
