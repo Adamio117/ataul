@@ -80,7 +80,11 @@ app.post("/submit-order", async (req, res) => {
       .select();
 
     if (error) {
-      console.error("Supabase error:", error);
+      console.error("Supabase error details:", {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+      });
       throw new Error("Database error");
     }
 
