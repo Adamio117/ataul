@@ -45,8 +45,11 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: process.env.EMAIL_USER || "fallback@email.com", // защита от undefined
-    pass: process.env.EMAIL_PASS || "fallback_password",
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+  tls: {
+    rejectUnauthorized: false, // Добавьте эту строку для избежания ошибок SSL
   },
 });
 
@@ -69,13 +72,13 @@ app.get("/health", (req, res) => {
 
 // Order submission endpoint
 app.post("/submit-order", async (req, res) => {
-  console.log("Received order data:", req.body);
-
   try {
     // Проверка обязательных полей
     const requiredFields = ["name", "email", "phone"];
     const missingFields = requiredFields.filter((field) => !req.body[field]);
-
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      throw new Error("Email credentials are not configured!");
+    }
     if (missingFields.length > 0) {
       return res.status(400).json({
         success: false,
@@ -134,10 +137,10 @@ app.post("/submit-order", async (req, res) => {
       data,
     });
   } catch (err) {
-    console.error("Server error:", err);
+    console.error("Ошибка:", err.message);
     res.status(500).json({
       success: false,
-      error: err.message || "Internal server error",
+      error: "Ошибка сервера. Пожалуйста, попробуйте позже.",
     });
   }
 });
@@ -155,7 +158,8 @@ app.use((err, req, res, next) => {
     message: process.env.NODE_ENV === "development" ? err.message : undefined,
   });
 });
-
+console.log("Попытка отправки письма на:", process.env.NOTIFICATION_EMAIL);
+console.log("Используемый пользователь:", process.env.EMAIL_USER);
 // Server Start
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
