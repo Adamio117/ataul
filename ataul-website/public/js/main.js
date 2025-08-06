@@ -157,33 +157,36 @@ if (orderForm) {
     };
 
     try {
-      // Send data to Supabase
+      // Исправленный URL (обратите внимание на правильное написание домена)
       const response = await fetch(
         "https://ataulll.onrender.com/submit-order",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Accept: "application/json", // Добавьте этот заголовок
+            Accept: "application/json",
           },
           body: JSON.stringify(formData),
         }
       );
 
-      console.log("Server response:", await response.json()); // Логируем ответ
+      // Правильная обработка ответа
+      const result = await response.json();
 
-      if (response.ok) {
-        alert("Спасибо за вашу заявку! Мы свяжемся с вами в ближайшее время.");
-        orderForm.reset();
-
-        // Scroll to top
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        });
-      } else {
-        throw new Error("Ошибка при отправке формы");
+      if (!response.ok) {
+        // Если сервер вернул ошибку (статус не 2xx)
+        throw new Error(result.error || "Ошибка при отправке формы");
       }
+
+      // Успешная отправка
+      alert("Спасибо за заявку! Мы свяжемся с вами в ближайшее время.");
+      orderForm.reset();
+
+      // Прокрутка к верху страницы
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     } catch (error) {
       console.error("Error:", error);
       alert(

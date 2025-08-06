@@ -67,14 +67,18 @@ app.post("/submit-order", async (req, res) => {
   console.log("Received order data:", req.body);
 
   try {
-    // Validate required fields
-    if (!req.body.name || !req.body.email || !req.body.phone) {
+    // Проверка обязательных полей
+    const requiredFields = ["name", "email", "phone"];
+    const missingFields = requiredFields.filter((field) => !req.body[field]);
+
+    if (missingFields.length > 0) {
       return res.status(400).json({
-        error: "Missing required fields: name, email, phone",
+        success: false,
+        error: `Missing required fields: ${missingFields.join(", ")}`,
       });
     }
 
-    // Save to Supabase
+    // Сохранение в Supabase
     const { data, error } = await supabase
       .from("orders")
       .insert([
@@ -94,61 +98,30 @@ app.post("/submit-order", async (req, res) => {
       ])
       .select();
 
-    if (error) throw error;
+    if (error) {
+      console.error("Supabase error:", error);
+      throw new Error("Database error");
+    }
 
-    // Send email notification
+    // Отправка email
     await transporter.sendMail({
       from: `"Ataul Notifications" <${process.env.EMAIL_USER}>`,
       to: process.env.NOTIFICATION_EMAIL,
       subject: "Новая заявка на сайте",
-      html: `
-        <h2>Новая заявка</h2>
-        <p><strong>Имя:</strong> ${req.body.name}</p>
-        <p><strong>Email:</strong> ${req.body.email}</p>
-        <p><strong>Телефон:</strong> ${req.body.phone}</p>
-        <p><strong>Компания:</strong> ${req.body.company || "Не указана"}</p>
-        <p><strong>Тип сайта:</strong> ${req.body.site_type || "Не указан"}</p>
-        <p><strong>Комментарии:</strong> ${
-          req.body.comments || "Не указаны"
-        }</p>
-      `,
+      html: `index.html`, // ваш HTML шаблон
     });
 
-    // Send Telegram notification
-    if (process.env.TELEGRAM_TOKEN && process.env.TELEGRAM_CHAT_ID) {
-      await fetch(
-        `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chat_id: process.env.TELEGRAM_CHAT_ID,
-            text: `📌 Новая заявка на сайте:\n\n👤 Имя: ${
-              req.body.name
-            }\n📞 Телефон: ${req.body.phone}\n📧 Email: ${
-              req.body.email
-            }\n🏢 Компания: ${
-              req.body.company || "Не указана"
-            }\n🌐 Тип сайта: ${req.body.site_type || "Не указан"}\n📅 Сроки: ${
-              req.body.deadline || "Не указаны"
-            }\n💰 Бюджет: ${req.body.budget || "Не указан"}`,
-            parse_mode: "HTML",
-          }),
-        }
-      );
-    }
-
+    // Успешный ответ
     res.json({
       success: true,
       message: "Order submitted successfully",
       data,
     });
   } catch (err) {
-    console.error("Error:", err);
+    console.error("Server error:", err);
     res.status(500).json({
       success: false,
-      error: "Internal server error",
-      details: process.env.NODE_ENV === "development" ? err.message : undefined,
+      error: err.message || "Internal server error",
     });
   }
 });
