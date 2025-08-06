@@ -18,7 +18,7 @@ app.use(
   cors({
     origin: function (origin, callback) {
       const allowedOrigins = [
-        "https://ataulll.onrender.com",
+        "https://ataulll.onrender.com", // основной домен
         "http://localhost:3000",
       ];
       if (!origin || allowedOrigins.includes(origin)) {
@@ -45,10 +45,15 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.EMAIL_USER || "fallback@email.com", // защита от undefined
+    pass: process.env.EMAIL_PASS || "fallback_password",
   },
 });
+
+// Добавьте проверку до отправки
+if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+  console.error("Email credentials are missing!");
+}
 
 // Routes
 app.get("/", (req, res) => {
@@ -108,7 +113,18 @@ app.post("/submit-order", async (req, res) => {
       from: `"Ataul Notifications" <${process.env.EMAIL_USER}>`,
       to: process.env.NOTIFICATION_EMAIL,
       subject: "Новая заявка на сайте",
-      html: `index.html`, // ваш HTML шаблон
+      html: `
+      <h1>Новая заявка</h1>
+      <p><strong>Имя:</strong> ${req.body.name}</p>
+      <p><strong>Email:</strong> ${req.body.email}</p>
+      <p><strong>Телефон:</strong> ${req.body.phone}</p>
+      ${
+        req.body.company
+          ? `<p><strong>Компания:</strong> ${req.body.company}</p>`
+          : ""
+      }
+      <!-- остальные поля -->
+    `, // ваш HTML шаблон
     });
 
     // Успешный ответ
