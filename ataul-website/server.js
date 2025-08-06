@@ -1,84 +1,11 @@
-require("dotenv").config();
-const express = require("express");
-const { createClient } = require("@supabase/supabase-js");
-const nodemailer = require("nodemailer");
-const fetch = require("node-fetch");
-const cors = require("cors");
-const path = require("path");
-
-const app = express();
-
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
-
-// CORS Configuration
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      const allowedOrigins = [
-        "https://ataulll.onrender.com", // основной домен
-        "http://localhost:3000",
-      ];
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ["GET", "POST", "OPTIONS"],
-
-    credentials: true,
-  })
-);
-app.options("*", cors());
-// Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
-
-// Email transporter
-const transporter = nodemailer.createTransport({
-  host: "smtp.yandex.ru",
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false, // Добавьте эту строку для избежания ошибок SSL
-  },
-});
-
-// Добавьте проверку до отправки
-if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-  console.error("Email credentials are missing!");
-}
-
-// Routes
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    status: "OK",
-    timestamp: new Date().toISOString(),
-  });
-});
-
-// Order submission endpoint
 app.post("/submit-order", async (req, res) => {
+  console.log("Received order data:", req.body);
+
   try {
-    // Проверка обязательных полей
+    // 1. Проверка обязательных полей
     const requiredFields = ["name", "email", "phone"];
     const missingFields = requiredFields.filter((field) => !req.body[field]);
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      throw new Error("Email credentials are not configured!");
-    }
+
     if (missingFields.length > 0) {
       return res.status(400).json({
         success: false,
@@ -86,7 +13,7 @@ app.post("/submit-order", async (req, res) => {
       });
     }
 
-    // Сохранение в Supabase
+    // 2. Сохранение в Supabase
     const { data, error } = await supabase
       .from("orders")
       .insert([
@@ -111,58 +38,17 @@ app.post("/submit-order", async (req, res) => {
       throw new Error("Database error");
     }
 
-    // Отправка email
-    await transporter.sendMail({
-      from: `"Ataul Notifications" <${process.env.EMAIL_USER}>`,
-      to: process.env.NOTIFICATION_EMAIL,
-      subject: "Новая заявка на сайте",
-      html: `
-      <h1>Новая заявка</h1>
-      <p><strong>Имя:</strong> ${req.body.name}</p>
-      <p><strong>Email:</strong> ${req.body.email}</p>
-      <p><strong>Телефон:</strong> ${req.body.phone}</p>
-      ${
-        req.body.company
-          ? `<p><strong>Компания:</strong> ${req.body.company}</p>`
-          : ""
-      }
-      <!-- остальные поля -->
-    `, // ваш HTML шаблон
-    });
-
-    // Успешный ответ
+    // 3. Успешный ответ (без отправки email)
     res.json({
       success: true,
       message: "Order submitted successfully",
       data,
     });
   } catch (err) {
-    console.error("Ошибка:", err.message);
+    console.error("Server error:", err);
     res.status(500).json({
       success: false,
-      error: "Ошибка сервера. Пожалуйста, попробуйте позже.",
+      error: err.message || "Internal server error",
     });
   }
-});
-
-// 404 Handler
-app.use((req, res) => {
-  res.status(404).sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-// Error Handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    error: "Something went wrong!",
-    message: process.env.NODE_ENV === "development" ? err.message : undefined,
-  });
-});
-console.log("Попытка отправки письма на:", process.env.NOTIFICATION_EMAIL);
-console.log("Используемый пользователь:", process.env.EMAIL_USER);
-// Server Start
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
 });
