@@ -1,8 +1,54 @@
+require("dotenv").config();
+const express = require("express");
+const { createClient } = require("@supabase/supabase-js");
+const cors = require("cors");
+const path = require("path");
+
+// 1. Создаем экземпляр приложения (это было пропущено!)
+const app = express();
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
+
+// CORS Configuration
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      const allowedOrigins = [
+        "https://ataulll.onrender.com",
+        "http://localhost:3000",
+      ];
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "OPTIONS"],
+    credentials: true,
+  })
+);
+app.options("*", cors());
+
+// 2. Supabase client
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
+
+// 3. Добавьте базовый роут для проверки работы
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// 4. Эндпоинт для заказов (ваш код)
 app.post("/submit-order", async (req, res) => {
   console.log("Received order data:", req.body);
 
   try {
-    // 1. Проверка обязательных полей
+    // Проверка обязательных полей
     const requiredFields = ["name", "email", "phone"];
     const missingFields = requiredFields.filter((field) => !req.body[field]);
 
@@ -13,7 +59,7 @@ app.post("/submit-order", async (req, res) => {
       });
     }
 
-    // 2. Сохранение в Supabase
+    // Сохранение в Supabase
     const { data, error } = await supabase
       .from("orders")
       .insert([
@@ -38,7 +84,6 @@ app.post("/submit-order", async (req, res) => {
       throw new Error("Database error");
     }
 
-    // 3. Успешный ответ (без отправки email)
     res.json({
       success: true,
       message: "Order submitted successfully",
@@ -51,4 +96,10 @@ app.post("/submit-order", async (req, res) => {
       error: err.message || "Internal server error",
     });
   }
+});
+
+// Запуск сервера
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
