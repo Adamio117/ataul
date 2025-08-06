@@ -18,8 +18,7 @@ app.use(
   cors({
     origin: function (origin, callback) {
       const allowedOrigins = [
-        "https://ataul-4b4z.onrender.com",
-        "https://ataull1onrender.com",
+        "https://ataulll.onrender.com",
         "http://localhost:3000",
       ];
       if (!origin || allowedOrigins.includes(origin)) {
