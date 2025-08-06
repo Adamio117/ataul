@@ -158,14 +158,17 @@ if (orderForm) {
 
     try {
       // Send data to Supabase
-      const response = await fetch("https://ataulll.onrender.com", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json", // Добавьте этот заголовок
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        "https://ataull1.onrender.com/submit-order",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json", // Добавьте этот заголовок
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       console.log("Server response:", await response.json()); // Логируем ответ
 
